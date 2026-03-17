@@ -32,7 +32,7 @@ class Cell:
         return cell
 
     def __str__(self):
-        return str("".join(["1" if self[i] else "0" for i in range(1, self.size + 1)]))
+        return str(self.get_value())
 
     def __repr__(self):
         return str("".join(["1" if self[i] else "0" for i in range(1, self.size + 1)]))
@@ -234,11 +234,18 @@ class Sudoku:
     def __repr__(self):
         return str(self)
 
+    def to_string(self) -> str:
+        return "".join([str(c) for c in self.puzzle.flat])
+
 
 # test puzzle
 puzzle_str = (
     "030104506201000009407600080700000342306020908000308700000589200180430605590006007"
 )
+solution_str = (
+    "839174526261853479457692183718965342346721958925348761673589214182437695594216837"
+)
 
 puzzle = Sudoku.new_from_string(puzzle_str)
 puzzle.solve()
+assert puzzle.to_string() == solution_str
