@@ -137,13 +137,62 @@ class Sudoku:
 
     def solve(self) -> str:
         """
-        Attempts to solve the puzzle.
+        Attempts to solve the sudoku puzzle.
         """
 
+        print(self)
+        print(self.puzzle)
+
+        # trivial cases
         if self.size == 0:
             return ""
+        if self.size == 1:
+            return "1"
 
-        print(puzzle)
+        solved_cells = set()
+        def next_solved() -> (int, int):
+            for r in range(self.size):
+                for c in range(self.size):
+                    if self.puzzle[r, c].get_value() != 0:
+                        if (r, c) not in solved_cells:
+                            solved_cells.add((r, c))
+                            return (r, c)
+            return (-1, -1)
+
+        # naive: use solved cells to remove possible values
+        while True:
+            # find a cell with a single possible value
+            (r, c) = next_solved()
+            if r == -1 or c == -1:
+                break
+
+            # get value of cell
+            val = self.puzzle[r, c].get_value()
+            if val == 0:
+                raise Exception("Solved cell has no value.")
+
+            # remove value from all other cells in row
+            for c2 in range(self.size):
+                if c2 != c:
+                    self.puzzle[r, c2].unset_flag(val)
+
+            # remove value from all other cells in column
+            for r2 in range(self.size):
+                if r2 != r:
+                    self.puzzle[r2, c].unset_flag(val)
+
+            # remove value from all other cells in block
+            block_size = int(math.sqrt(self.size))
+            block_row = r // block_size
+            block_col = c // block_size
+            for r2 in range(block_row * block_size, (block_row + 1) * block_size):
+                for c2 in range(block_col * block_size, (block_col + 1) * block_size):
+                    if r2 != r or c2 != c:
+                        self.puzzle[r2, c2].unset_flag(val)
+
+        print(self)
+        print(self.puzzle)
+
 
         return
 
