@@ -140,8 +140,8 @@ class Sudoku:
         Attempts to solve the sudoku puzzle.
         """
 
-        print(self)
-        print(self.puzzle)
+        # print(self)
+        # print(self.puzzle)
 
         # trivial cases
         if self.size == 0:
@@ -191,10 +191,12 @@ class Sudoku:
                     if r2 != r or c2 != c:
                         self.puzzle[r2, c2].unset_flag(val)
 
-        print(self)
-        print(self.puzzle)
+        # print(self)
+        # print(self.puzzle)
 
-        return
+        # TODO: lookahead/backtracking/whatever it's supposed to be
+
+        return self.to_string()
 
     def __str__(self):
         if self.size == 0:
@@ -238,14 +240,15 @@ class Sudoku:
         return "".join([str(c) for c in self.puzzle.flat])
 
 
-# test puzzle
-puzzle_str = (
-    "030104506201000009407600080700000342306020908000308700000589200180430605590006007"
-)
-solution_str = (
-    "839174526261853479457692183718965342346721958925348761673589214182437695594216837"
-)
+if __name__ == "__main__":
+    # for testing purposes only!
+    puzzle_str = (
+        "030104506201000009407600080700000342306020908000308700000589200180430605590006007"
+    )
+    solution_str = (
+        "839174526261853479457692183718965342346721958925348761673589214182437695594216837"
+    )
 
-puzzle = Sudoku.new_from_string(puzzle_str)
-puzzle.solve()
-assert puzzle.to_string() == solution_str
+    puzzle = Sudoku.new_from_string(puzzle_str)
+    puzzle.solve()
+    assert puzzle.to_string() == solution_str

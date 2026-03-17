@@ -1,9 +1,11 @@
 import aiohttp
 import asyncio
+import difflib
 from dotenv import load_dotenv
 import os
 
-import solver as s
+
+from solver import Sudoku
 
 load_dotenv()
 API_KEY = os.getenv("YOUDOSUDOKU_API_KEY")
@@ -39,12 +41,33 @@ async def get_puzzle(difficulty: str = "hard") -> dict:
 
 
 async def main():
-    puzzle = None
+    res = None
 
     try:
-        puzzle = await get_puzzle("easy")
+        res = await get_puzzle("medium")
     except Exception as e:
         print(e)
+
+    if not res:
+        return
+
+    puzzle = res["puzzle"]
+    solution = res["solution"]
+
+    output = Sudoku.new_from_string(puzzle).solve()
+
+    print(f"solution: {solution}")
+    print(f"  answer: {output}")
+
+    if output != solution:
+        print(
+            f"    diff: {"".join([
+            "^" if solution[i] != output[i] else " " for i in range(len(solution))
+        ])}"
+        )
+        print("NO MATCH")
+    else:
+        print("CORRECT SOLUTION")
 
 
 if __name__ == "__main__":
