@@ -45,8 +45,6 @@ async def main():
         puzzle = await get_puzzle("easy")
     except Exception as e:
         print(e)
-    
-
 
 
 if __name__ == "__main__":

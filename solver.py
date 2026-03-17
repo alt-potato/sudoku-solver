@@ -27,7 +27,7 @@ class Cell:
 
     def full(size: int = 9):
         cell = Cell.empty(size)
-        cell.bits = (1 << size) - 1 # just manually set the bits tbh
+        cell.bits = (1 << size) - 1  # just manually set the bits tbh
 
         return cell
 
@@ -150,6 +150,7 @@ class Sudoku:
             return "1"
 
         solved_cells = set()
+
         def next_solved() -> (int, int):
             for r in range(self.size):
                 for c in range(self.size):
@@ -192,7 +193,6 @@ class Sudoku:
 
         print(self)
         print(self.puzzle)
-
 
         return
 
