@@ -18,15 +18,18 @@ class Cell:
         self.size = size
 
         if index < 1:
-            self.bits = ~0b0
+            self.bits = (1 << size) - 1
         else:
             self.bits = 1 << (index - 1)
 
-    def empty():
-        return Cell(0)
+    def empty(size: int = 9):
+        return Cell(0, size)
 
-    def full():
-        return Cell(~0b0)
+    def full(size: int = 9):
+        cell = Cell.empty(size)
+        cell.bits = (1 << size) - 1 # just manually set the bits tbh
+
+        return cell
 
     def __str__(self):
         return str("".join(["1" if self[i] else "0" for i in range(1, self.size + 1)]))
@@ -78,50 +81,55 @@ class Cell:
         if self.bits > 0 and (self.bits & (self.bits - 1)) == 0:
             return int(math.log2(self.bits)) + 1
         return 0
-    
+
     def get_possibility_count(self) -> int:
         """Returns the number of possible values for this cell."""
         mask = (1 << self.size) - 1
-        return bin(self.bits & mask).count('1')
+        return bin(self.bits & mask).count("1")
 
 
 class Sudoku:
-    def validate_size(count: int) -> int:
-        """Ensures that the puzzle is a square and a multiple of 3.
+    def validate_shape(shape: (int, int)) -> int:
+        """Ensures that the puzzle is a valid NxN grid.
 
         Returns the side length of the puzzle if valid, and raises an exception if not.
 
-        NOTE: THIS IMPLEMENTATION IS INCORRECT! TODO: FIX
-        From wikipedia:
-            The classic 9x9 Sudoku format can be generalized to an NxN row-column grid 
-            partitioned into N regions, where each of the N rows, columns and regions 
+        ---
+
+        From Wikipedia:
+            The classic 9x9 Sudoku format can be generalized to an NxN row-column grid
+            partitioned into N regions, where each of the N rows, columns and regions
             have N cells and each of the N digits occur once in each row, column or region.
         """
 
-        N = math.sqrt(count)
-        if N % 1 != 0:
+        if shape[0] != shape[1]:
             raise Exception("Puzzle must be square.")
-        if N % 3 != 0:
-            raise Exception("Puzzle size must be a multiple of 3.")
-        N = int(N)
+        if shape[0] < 0:
+            raise Exception("Puzzle cannot be negative size.")
+        if math.sqrt(shape[0]) % 1 != 0:
+            raise Exception("Puzzle cannot be split into squares.")
 
-        return N
+        return shape[0]
 
     def __init__(self, puzzle: np.ndarray):
-        N = Sudoku.validate_size(puzzle.size)
-        if puzzle.shape != (N, N):
-            raise Exception("Puzzle must be square.")
+        N = Sudoku.validate_shape(puzzle.shape)
 
         self.size = N
         self.puzzle = puzzle
 
     def new_from_string(puzzle: str) -> Sudoku:
-        """Parse the puzzle string into an NxN numpy array, where (N | 3).
+        """Parse the puzzle string into an NxN numpy array, where N = M^2.
 
         Throws an exception if the puzzle does not meet this condition.
         """
 
-        N = Sudoku.validate_size(len(puzzle))
+        if len(puzzle) == 0:
+            return Sudoku([])
+
+        N = int(math.sqrt(len(puzzle)))
+        if N * N != len(puzzle):
+            raise Exception("Puzzle must be square.")
+
         cells = [Cell(int(c)) for c in puzzle]
         puzzle = np.array(cells).reshape((N, N))
 
