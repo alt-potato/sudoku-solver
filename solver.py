@@ -78,6 +78,11 @@ class Cell:
         if self.bits > 0 and (self.bits & (self.bits - 1)) == 0:
             return int(math.log2(self.bits)) + 1
         return 0
+    
+    def get_possibility_count(self) -> int:
+        """Returns the number of possible values for this cell."""
+        mask = (1 << self.size) - 1
+        return bin(self.bits & mask).count('1')
 
 
 class Sudoku:
@@ -85,6 +90,12 @@ class Sudoku:
         """Ensures that the puzzle is a square and a multiple of 3.
 
         Returns the side length of the puzzle if valid, and raises an exception if not.
+
+        NOTE: THIS IMPLEMENTATION IS INCORRECT! TODO: FIX
+        From wikipedia:
+            The classic 9x9 Sudoku format can be generalized to an NxN row-column grid 
+            partitioned into N regions, where each of the N rows, columns and regions 
+            have N cells and each of the N digits occur once in each row, column or region.
         """
 
         N = math.sqrt(count)
@@ -142,8 +153,14 @@ class Sudoku:
         def format_row(r):
             res = BOX_LINES[1] + " "
             for c in range(self.size):
-                val = self.puzzle[r, c].get_value()
-                res += (CHARS[val] if val != 0 else "·") + " "
+                cell = self.puzzle[r, c]
+                val = cell.get_value()
+                if val != 0:
+                    display = CHARS[val]
+                else:
+                    count = cell.get_possibility_count()
+                    display = "·" if count == self.size else "?"
+                res += display + " "
                 if (c + 1) % block_size == 0:
                     res += BOX_LINES[1] + " "
             return res.rstrip() + "\n"
